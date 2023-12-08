@@ -1,5 +1,5 @@
 'use strict';
-
+const ModuleFederationPlugin = require("webpack/lib/container/ModuleFederationPlugin");
 const fs = require('fs');
 const path = require('path');
 const webpack = require('webpack');
@@ -219,7 +219,8 @@ module.exports = function (webpackEnv) {
       // webpack uses `publicPath` to determine where the app is being served from.
       // It requires a trailing slash, or the file assets will get an incorrect path.
       // We inferred the "public path" (such as / or /my-project) from homepage.
-      publicPath: paths.publicUrlOrPath,
+      //publicPath: paths.publicUrlOrPath,
+      publicPath: "auto",
       // Point sourcemap entries to original disk location (format as URL on Windows)
       devtoolModuleFilenameTemplate: isEnvProduction
         ? info =>
@@ -321,6 +322,7 @@ module.exports = function (webpackEnv) {
         ...(modules.webpackAliases || {}),
       },
       plugins: [
+
         // Prevents users from importing files from outside of src/ (or node_modules/).
         // This often causes confusion because we only process files within src/ with babel.
         // To fix this, we prevent you from importing files out of src/ -- if you'd like to,
@@ -563,6 +565,13 @@ module.exports = function (webpackEnv) {
       ].filter(Boolean),
     },
     plugins: [
+      new ModuleFederationPlugin({
+        name: "mfmodule",  // This application named 'HeaderApp'
+        filename: "remoteEntry.js",  // output a js file
+        exposes: { // which exposes
+          "./App": "./src/App",  // a module 'Header' from './src/App'
+        }
+    }),      
       // Generates an `index.html` file with the <script> injected.
       new HtmlWebpackPlugin(
         Object.assign(
